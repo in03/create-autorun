@@ -30,6 +30,7 @@
 ####################################################################################
 
 set -o nounset -o pipefail
+shopt -s extglob
 [[ -L /dev/fd ]] || ln -fns /proc/self/fd /dev/fd		# KLUDGE: `/dev/fd` isn't always created by QTS.
 readonly r_user_args_raw=$*
 
@@ -37,7 +38,7 @@ Init()
 	{
 
 	local -r r_script_file=create-autorun.sh
-	local -r r_script_version=250708
+	local -r r_script_version=250930
 	exitcode=0
 
 	# Include QNAP functions.
@@ -97,11 +98,11 @@ DetermineAutorunPartitionLocation()
 			fi
 
 			case $(/sbin/getcfg System Model) in
-				TS-X16|TS-X28A|TS-XA28A|TS-X33|TS-X35EU)
-					autorun_partition+=5
+				TS-X@(16|28A|A28A|33|35EU))
+					autorun_partition+='5'
 					;;
 				*)
-					autorun_partition+=6
+					autorun_partition+='6'
 			esac
 		elif [[ $r_nas_arc = TS-NASARM ]]; then
 			autorun_partition=/dev/mtdblock5
@@ -441,4 +442,4 @@ UnmountAutorunPartition
 RemoveMountPoint
 ShowResult
 
-exit "$exitcode"
+exit $exitcode
